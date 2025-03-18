@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<fmiModelDescription
+  fmiVersion="2.0"
+  modelName="vECU_Airbag"
+  guid="{8c4e810f-3df3-4a00-8276-176fa3c9f009}">
+
+<CoSimulation
+  modelIdentifier="vECU_Airbag"
+  canHandleVariableCommunicationStepSize="true"
+    canGetAndSetFMUstate = "true"
+    canSerializeFMUstate = "true"
+    providesDirectionalDerivative = "false"
+    canInterpolateInputs = "false">
+  <SourceFiles>
+    <File name="vECU_Airbag.c"/>
+  </SourceFiles>
+</CoSimulation>
+
+
+<LogCategories>
+  <Category name="logAll"/>
+  <Category name="logError"/>
+  <Category name="logFmiCall"/>
+  <Category name="logEvent"/>
+</LogCategories>
+
+<ModelVariables>
+  <ScalarVariable name="PADS" valueReference="0" description="Passenger Airbag Disable Switch (0: Not_Turn_Off_PA, 1: Turn_Off_PA)"
+                  causality="input" variability="discrete" initial="exact">
+     <Integer start="0"/>
+  </ScalarVariable>
+  <ScalarVariable name="PADL" valueReference="1" description="Passenger Airbag Disable Lamp (0: Turn_Off_PADL, 1: Turn_On_PADL)"
+                  causality="output" variability="discrete" initial="exact">
+     <Integer start="0"/>
+  </ScalarVariable>
+  <ScalarVariable name="PAEL" valueReference="2" description="Passenger Airbag Enable Lamp (0: Turn_Off_PAEL, 1: Turn_On_PAEL)"
+                  causality="output" variability="discrete" initial="exact">
+  <Integer start="1"/>
+</ScalarVariable>
+</ModelVariables>
+
+<ModelStructure>
+  <Outputs>
+    <Unknown index="2" />
+    <Unknown index="3" />
+  </Outputs>
+</ModelStructure>
+
+</fmiModelDescription>

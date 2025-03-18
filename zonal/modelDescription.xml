@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<fmiModelDescription
+  fmiVersion="2.0"
+  modelName="vecu_zonal"
+  guid="{8c4e810f-3df3-4a00-8276-176fa3c9f003}">
+
+<CoSimulation
+  modelIdentifier="vecu_zonal"
+  canHandleVariableCommunicationStepSize="true"
+    canGetAndSetFMUstate = "true"
+    canSerializeFMUstate = "true"
+    providesDirectionalDerivative = "false"
+    canInterpolateInputs = "false">
+  <SourceFiles>
+    <File name="vecu_zonal.c"/>
+  </SourceFiles>
+</CoSimulation>
+
+
+<LogCategories>
+  <Category name="logAll"/>
+  <Category name="logError"/>
+  <Category name="logFmiCall"/>
+  <Category name="logEvent"/>
+</LogCategories>
+
+<ModelVariables>
+  <ScalarVariable name="In_PassengerAirbagIsDisabled_bo" valueReference="0" description="Passenger airbag enable input signal"
+                  causality="input" variability="discrete" initial="exact">
+     <Boolean start="false"/>
+  </ScalarVariable>
+  <ScalarVariable name="In_PassengerAirbagWarningState_se" valueReference="0" description="Passenger airbag warning states input signal"
+                  causality="input" variability="discrete" initial="exact">
+     <Integer start="0"/>
+  </ScalarVariable>
+  <ScalarVariable name="In_UserConfirmAirbagState_se" valueReference="2" description="User confirmation airbag states input signal"
+                  causality="input" variability="discrete" initial="exact">
+     <Integer start="0"/>
+  </ScalarVariable>
+  <ScalarVariable name="Out_PassengerAirbagDeactivationSwitch_bo" valueReference="1" description="Passenger airbag enable output signal"
+                  causality="output" variability="discrete" initial="exact">
+     <Boolean start="false"/>
+  </ScalarVariable>
+  <ScalarVariable name="Out_PassengerAirbagWarningState_se" valueReference="1" description="Passenger airbag warning states output signal"
+                  causality="output" variability="discrete" initial="exact">
+    <Integer start="0"/>
+  </ScalarVariable>
+  <ScalarVariable name="Out_UserConfirmAirbagState_se" valueReference="3" description="User confirmation airbag states output signal"
+                  causality="output" variability="discrete" initial="exact">
+  <Integer start="0"/>
+  </ScalarVariable>
+</ModelVariables>
+
+<ModelStructure>
+  <Outputs>
+    <Unknown index="4" />
+    <Unknown index="5" />
+    <Unknown index="6" />
+  </Outputs>
+</ModelStructure>
+
+</fmiModelDescription>

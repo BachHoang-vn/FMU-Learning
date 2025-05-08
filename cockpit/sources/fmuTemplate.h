@@ -1,170 +1,185 @@
-/* ---------------------------------------------------------------------------*
- * fmuTemplate.h
- * Definitions by the includer of this file
- * Copyright QTronic GmbH. All rights reserved.
- * ---------------------------------------------------------------------------*/
+@import url("./ComponentStyle/Lamp.css");
+@import url("./ComponentStyle/Button.css");
+@import url("./ComponentStyle/Text.css");
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+body {
+    background-image: url('./Images/PageBackground.jpg'); /* My image path */
+    background-size: cover;                 /* Ensures the image covers the entire screen */
+    background-position: center;            /* Centers the image */
+    background-repeat: no-repeat;           /* Prevents repetition */
+    background-attachment: fixed;           /* Keeps the background fixed while scrolling */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;                            /* Full viewport height */
+    margin: 0;
+    padding: 0;
+    font-size: clamp(14px, 1.2vw, 18px); /* Base font-size */
 
-// C-code FMUs have functions names prefixed with MODEL_IDENTIFIER_.
-// Define DISABLE_PREFIX to build a binary FMU.
-#ifndef DISABLE_PREFIX
-#define pasteA(a,b)     a ## b
-#define pasteB(a,b)    pasteA(a,b)
-#define FMI2_FUNCTION_PREFIX pasteB(MODEL_IDENTIFIER, _)
-#endif
-#include "fmi2Functions.h"
+}
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+.RootContainer {
+    position: absolute;
+    top: 25%;                           /* 50% from the top of the viewport */
+    left: 20%;                          /* 50% from the left of the viewport */
+    height: 50%;
+    width: 60%;                         /* 80% of the page width */
+    margin: 0 auto;                     /* Center the container horizontally */
+    padding: 0px;                      /* Padding inside the container */
+    background-color: rgba(8, 5, 2, 0);    /* Semi-transparent background */
+    border-radius: 10px;                /* Rounded corners */
 
-// macros used to define variables
-#define  r(vr) comp->r[vr]
-#define  i(vr) comp->i[vr]
-#define  b(vr) comp->b[vr]
-#define  s(vr) comp->s[vr]
-#define pos(z) comp->isPositive[z]
-#define copy(vr, value) setString(comp, vr, value)
+    /* Grid Layout */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* Three columns */
+    gap: 10px; /* Adjust spacing between cells */
+}
 
-fmi2Status setString(fmi2Component comp, fmi2ValueReference vr, fmi2String value);
+/* LeftPane placement */
+.LeftPane { 
+    grid-column: 1 / 2;
+    display: grid;
+    grid-template-rows: 15% 40% 20% 25%; /* Adjusted to sum to 100% */
+    gap: 0px;                           /* Reduced gap */
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 0px solid gray;       
+    border-radius: 15px;
+    background-image: url('Images/CarModel.png');
+    background-size: contain;
+    background-position: center; 
+    background-repeat: no-repeat;
+}
 
-// categories of logging supported by model.
-// Value is the index in logCategories of a ModelInstance.
-#define LOG_ALL       0
-#define LOG_ERROR     1
-#define LOG_FMI_CALL  2
-#define LOG_EVENT     3
+.LeftPane .LeftPane-GridItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(1, 107, 97, 0.95); /* Light transparent background */
+    border-radius: 0px;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding-left: 15px;
+    padding-right: 15px;
+    visibility: hidden;
+}
 
-#define NUMBER_OF_CATEGORIES 4
+/* Hides text, buttons, etc. but keeps the background */
+.LeftPane.hide-content * {
+    visibility: hidden;
+}
 
-typedef enum {
-    modelStartAndEnd        = 1<<0,
-    modelInstantiated       = 1<<1,
-    modelInitializationMode = 1<<2,
+/* .LeftPane.show-content * {
+    visibility: visible;
+} */
 
-    // ME states
-    modelEventMode          = 1<<3,
-    modelContinuousTimeMode = 1<<4,
-    // CS states
-    modelStepComplete       = 1<<5,
-    modelStepInProgress     = 1<<6,
-    modelStepFailed         = 1<<7,
-    modelStepCanceled       = 1<<8,
+.WarningIcon {
+    width: 20%;
+    height: 50%;
+    object-fit: contain;
+    height: auto;
+    /* margin-top: 15px; */
+    /* filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.7)); */
+}
 
-    modelTerminated         = 1<<9,
-    modelError              = 1<<10,
-    modelFatal              = 1<<11,
-} ModelState;
+.hide {
+    display: none !important;
+}
 
-// ---------------------------------------------------------------------------
-// Function calls allowed state masks for both Model-exchange and Co-simulation
-// ---------------------------------------------------------------------------
-#define MASK_fmi2GetTypesPlatform        (modelStartAndEnd | modelInstantiated | modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete | modelStepInProgress | modelStepFailed | modelStepCanceled \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2GetVersion              MASK_fmi2GetTypesPlatform
-#define MASK_fmi2SetDebugLogging         (modelInstantiated | modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete | modelStepInProgress | modelStepFailed | modelStepCanceled \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2Instantiate             (modelStartAndEnd)
-#define MASK_fmi2FreeInstance            (modelInstantiated | modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete | modelStepFailed | modelStepCanceled \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2SetupExperiment         modelInstantiated
-#define MASK_fmi2EnterInitializationMode modelInstantiated
-#define MASK_fmi2ExitInitializationMode  modelInitializationMode
-#define MASK_fmi2Terminate               (modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete | modelStepFailed)
-#define MASK_fmi2Reset                   MASK_fmi2FreeInstance
-#define MASK_fmi2GetReal                 (modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete | modelStepFailed | modelStepCanceled \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2GetInteger              MASK_fmi2GetReal
-#define MASK_fmi2GetBoolean              MASK_fmi2GetReal
-#define MASK_fmi2GetString               MASK_fmi2GetReal
-#define MASK_fmi2SetReal                 (modelInstantiated | modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete)
-#define MASK_fmi2SetInteger              (modelInstantiated | modelInitializationMode \
-                                        | modelEventMode \
-                                        | modelStepComplete)
-#define MASK_fmi2SetBoolean              MASK_fmi2SetInteger
-#define MASK_fmi2SetString               MASK_fmi2SetInteger
-#define MASK_fmi2GetFMUstate             MASK_fmi2FreeInstance
-#define MASK_fmi2SetFMUstate             MASK_fmi2FreeInstance
-#define MASK_fmi2FreeFMUstate            MASK_fmi2FreeInstance
-#define MASK_fmi2SerializedFMUstateSize  MASK_fmi2FreeInstance
-#define MASK_fmi2SerializeFMUstate       MASK_fmi2FreeInstance
-#define MASK_fmi2DeSerializeFMUstate     MASK_fmi2FreeInstance
-#define MASK_fmi2GetDirectionalDerivative (modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelStepComplete | modelStepFailed | modelStepCanceled \
-                                        | modelTerminated | modelError)
 
-// ---------------------------------------------------------------------------
-// Function calls allowed state masks for Model-exchange
-// ---------------------------------------------------------------------------
-#define MASK_fmi2EnterEventMode          (modelEventMode | modelContinuousTimeMode)
-#define MASK_fmi2NewDiscreteStates       modelEventMode
-#define MASK_fmi2EnterContinuousTimeMode modelEventMode
-#define MASK_fmi2CompletedIntegratorStep modelContinuousTimeMode
-#define MASK_fmi2SetTime                 (modelEventMode | modelContinuousTimeMode)
-#define MASK_fmi2SetContinuousStates     modelContinuousTimeMode
-#define MASK_fmi2GetEventIndicators      (modelInitializationMode \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2GetContinuousStates     MASK_fmi2GetEventIndicators
-#define MASK_fmi2GetDerivatives          (modelEventMode | modelContinuousTimeMode \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2GetNominalsOfContinuousStates ( modelInstantiated \
-                                        | modelEventMode | modelContinuousTimeMode \
-                                        | modelTerminated | modelError)
 
-// ---------------------------------------------------------------------------
-// Function calls allowed state masks for Co-simulation
-// ---------------------------------------------------------------------------
-#define MASK_fmi2SetRealInputDerivatives (modelInstantiated | modelInitializationMode \
-                                        | modelStepComplete)
-#define MASK_fmi2GetRealOutputDerivatives (modelStepComplete | modelStepFailed | modelStepCanceled \
-                                        | modelTerminated | modelError)
-#define MASK_fmi2DoStep                  modelStepComplete
-#define MASK_fmi2CancelStep              modelStepInProgress
-#define MASK_fmi2GetStatus               (modelStepComplete | modelStepInProgress | modelStepFailed \
-                                        | modelTerminated)
-#define MASK_fmi2GetRealStatus           MASK_fmi2GetStatus
-#define MASK_fmi2GetIntegerStatus        MASK_fmi2GetStatus
-#define MASK_fmi2GetBooleanStatus        MASK_fmi2GetStatus
-#define MASK_fmi2GetStringStatus         MASK_fmi2GetStatus
+/* MiddlePane placement */
+.MiddlePane { 
+    grid-column: 2 / 3;
+    display: grid;
+    grid-template-rows: 15% 75% 10%; /* Adjusted to sum to 100% */
+    gap: 0px;
+    border-radius: 15px;                           
+    box-sizing: border-box;
+    overflow: hidden;
+}
 
-typedef struct {
-    fmi2Real    *r;
-    fmi2Integer *i;
-    fmi2Boolean *b;
-    fmi2String  *s;
-    fmi2Boolean *isPositive;
+.MiddlePane .MiddlePane-GridItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0); /* Light transparent background */
+    border-radius: 0px;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    flex-direction: column;      /* Stack children vertically */
+}
 
-    fmi2Real time;
-    fmi2String instanceName;
-    fmi2Type type;
-    fmi2String GUID;
-    const fmi2CallbackFunctions *functions;
-    fmi2Boolean loggingOn;
-    fmi2Boolean logCategories[NUMBER_OF_CATEGORIES];
+/* RightPane placement */
+.RightPane { 
+    grid-column: 3 / 4;
+    display: grid;
+    grid-template-rows: 15% 75% 10%; /* Adjusted to sum to 100% */
+    gap: 0px;
+    border-radius: 15px;                           
+    box-sizing: border-box;
+    overflow: hidden;
+}
 
-    fmi2ComponentEnvironment componentEnvironment;
-    ModelState state;
-    fmi2EventInfo eventInfo;
-    fmi2Boolean isDirtyValues;
-    fmi2Boolean isNewEventIteration;
-} ModelInstance;
+.RightPane .RightPane-GridItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0); /* Light transparent background */
+    border-radius: 0px;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    flex-direction: column;      /* Stack children vertically */
+}
 
-#ifdef __cplusplus
-} // closing brace for extern "C"
-#endif
+h1, p {
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.HighlightText.warning-message {
+    color: rgba(204, 163, 0);
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(0.5rem, 1.75vw, 1.5rem);
+    font-weight: bold;
+    text-align: center;
+}
+
+.acknowledge-message {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 0.5em;
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(0.5rem, 1vw, 1.5rem);
+    padding: 0.5em 0.75em;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.message-box {
+    position: absolute;
+    /* object-fit: contain; */
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px; 
+    padding: 0.75rem 1.25rem;
+    background-color: rgba(255, 255, 255, 0.85);
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(0.5rem, 1vw, 1.5rem);
+    font-weight: 500;
+    border-radius: 0.5em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-align: center;
+    z-index: 10;
+    box-sizing: border-box;
+  }
+
